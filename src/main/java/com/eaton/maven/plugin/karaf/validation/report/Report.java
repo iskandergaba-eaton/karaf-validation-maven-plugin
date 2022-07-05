@@ -1,4 +1,4 @@
-package com.eaton.maven.plugin.report;
+package com.eaton.maven.plugin.karaf.validation.report;
 
 import java.util.EnumMap;
 import java.util.LinkedList;

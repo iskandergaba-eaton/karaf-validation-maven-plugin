@@ -1,4 +1,4 @@
-package com.eaton.maven.plugin.report;
+package com.eaton.maven.plugin.karaf.validation.report;
 
 /**
  * Simple object representing an issue encountered in the analise.

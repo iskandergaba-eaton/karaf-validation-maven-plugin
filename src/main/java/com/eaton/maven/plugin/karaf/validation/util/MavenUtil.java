@@ -1,4 +1,4 @@
-package com.eaton.maven.plugin.util;
+package com.eaton.maven.plugin.karaf.validation.util;
 
 import org.apache.maven.project.MavenProject;
 

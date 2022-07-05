@@ -1,9 +1,9 @@
-package com.eaton.maven.plugin.manifest;
+package com.eaton.maven.plugin.karaf.validation.manifest;
 
-import com.eaton.maven.plugin.report.CriticalityLevel;
-import com.eaton.maven.plugin.report.Issue;
-import com.eaton.maven.plugin.report.Report;
-import com.eaton.maven.plugin.util.MavenUtil;
+import com.eaton.maven.plugin.karaf.validation.report.Report;
+import com.eaton.maven.plugin.karaf.validation.report.CriticalityLevel;
+import com.eaton.maven.plugin.karaf.validation.report.Issue;
+import com.eaton.maven.plugin.karaf.validation.util.MavenUtil;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

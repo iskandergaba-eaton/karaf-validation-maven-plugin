@@ -1,4 +1,4 @@
-package com.eaton.maven.plugin;
+package com.eaton.maven.plugin.karaf.validation;
 
 import java.io.PrintStream;
 import java.util.List;

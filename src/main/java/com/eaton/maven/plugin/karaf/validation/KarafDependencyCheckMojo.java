@@ -1,4 +1,4 @@
-package com.eaton.maven.plugin;
+package com.eaton.maven.plugin.karaf.validation;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;

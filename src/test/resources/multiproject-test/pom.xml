@@ -19,7 +19,7 @@
         <plugins>
             <plugin>
                 <groupId>com.eaton.maven.plugin</groupId>
-                <artifactId>karaf-helper-plugin</artifactId>
+                <artifactId>karaf-validation-maven-plugin</artifactId>
                 <version>1</version>
                 <executions>
                     <execution>

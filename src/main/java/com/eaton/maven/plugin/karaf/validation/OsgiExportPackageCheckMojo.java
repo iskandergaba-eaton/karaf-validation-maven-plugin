@@ -1,20 +1,15 @@
-package com.eaton.maven.plugin;
+package com.eaton.maven.plugin.karaf.validation;
 
-import com.eaton.maven.plugin.manifest.PackageExportAnalyzer;
-import com.eaton.maven.plugin.report.CriticalityLevel;
-import com.eaton.maven.plugin.report.Issue;
-import com.eaton.maven.plugin.report.Report;
-import com.eaton.maven.plugin.util.MavenUtil;
+import com.eaton.maven.plugin.karaf.validation.manifest.PackageExportAnalyzer;
+import com.eaton.maven.plugin.karaf.validation.report.CriticalityLevel;
+import com.eaton.maven.plugin.karaf.validation.report.Issue;
+import com.eaton.maven.plugin.karaf.validation.report.Report;
+import com.eaton.maven.plugin.karaf.validation.util.MavenUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
 import java.util.jar.JarInputStream;
-import org.apache.felix.utils.manifest.Clause;
 import org.apache.felix.utils.manifest.Parser;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
