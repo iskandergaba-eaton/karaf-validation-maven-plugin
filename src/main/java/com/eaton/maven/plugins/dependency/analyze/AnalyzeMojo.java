@@ -27,140 +27,140 @@ import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyN
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Analyze the whole project and output incoherent dependencies with some fix tips
- *
  */
-@Mojo(name = "analyze", requiresDependencyCollection = ResolutionScope.TEST, threadSafe = true)
+@Mojo(name = "analyze",
+        aggregator = true
+)
 public class AnalyzeMojo extends AbstractMojo {
-	// fields -----------------------------------------------------------------
+    // fields -----------------------------------------------------------------
 
-	/**
-	 * The Maven project.
-	 */
-	@Parameter(defaultValue = "${project}", readonly = true, required = true)
-	private MavenProject project;
+    /**
+     * The Maven project.
+     */
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
+    private MavenProject project;
 
-	@Parameter(defaultValue = "${session}", readonly = true, required = true)
-	private MavenSession session;
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    private MavenSession session;
 
-	/**
-	 * Contains the full list of projects in the reactor.
-	 */
-	@Parameter(defaultValue = "${reactorProjects}", readonly = true, required = true)
-	private List<MavenProject> reactorProjects;
+    /**
+     * Contains the full list of projects in the reactor.
+     */
+    @Parameter(defaultValue = "${reactorProjects}", readonly = true, required = true)
+    private List<MavenProject> reactorProjects;
 
-	/**
-	 * The dependency collector builder to use.
-	 */
-	@Component(hint = "default")
-	private DependencyCollectorBuilder dependencyCollectorBuilder;
+    /**
+     * The dependency collector builder to use.
+     */
+    @Component(hint = "default")
+    private DependencyCollectorBuilder dependencyCollectorBuilder;
 
-	/**
-	 * The dependency graph builder to use.
-	 */
-	@Component(hint = "default")
-	private DependencyGraphBuilder dependencyGraphBuilder;
+    /**
+     * The dependency graph builder to use.
+     */
+    @Component(hint = "default")
+    private DependencyGraphBuilder dependencyGraphBuilder;
 
-	/**
-	 * The token set name to use when outputting the dependency tree. Possible
-	 * values are <code>whitespace</code>, <code>standard</code> or
-	 * <code>extended</code>, which use whitespace, standard (ie ASCII) or extended
-	 * character sets respectively.
-	 *
-	 * @since 2.0-alpha-6
-	 */
-	@Parameter(property = "tokens", defaultValue = "standard")
-	private String tokens;
+    /**
+     * The token set name to use when outputting the dependency tree. Possible
+     * values are <code>whitespace</code>, <code>standard</code> or
+     * <code>extended</code>, which use whitespace, standard (ie ASCII) or extended
+     * character sets respectively.
+     *
+     * @since 2.0-alpha-6
+     */
+    @Parameter(property = "tokens", defaultValue = "standard")
+    private String tokens;
 
-	/**
-	 * The computed dependency tree root node of the Maven project.
-	 */
-	private DependencyNode rootNode;
+    // Mojo methods -----------------------------------------------------------
 
-	// Mojo methods -----------------------------------------------------------
+    /*
+     * @see org.apache.maven.plugin.Mojo#execute()
+     */
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            // Building all dependencies trees
+            Map<MavenProject, DependencyNode> resolvedDependencies = new HashMap<>();
+            MavenProject mavenProject = new MavenProject();
 
-	/*
-	 * @see org.apache.maven.plugin.Mojo#execute()
-	 */
-	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			String dependencyTreeString;
+            for (MavenProject project : reactorProjects) {
+                System.out.println("Checking project "+project.getName());
 
-			ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
-					session.getProjectBuildingRequest());
+                ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
+                        session.getProjectBuildingRequest());
+                buildingRequest.setProject(project);
+                resolvedDependencies.put(project, dependencyGraphBuilder.buildDependencyGraph(buildingRequest,
+                        null));
+                System.out.println(serializeDependencyTree(resolvedDependencies.get(project)));
+            }
+        } catch (DependencyGraphBuilderException exception) {
+            throw new MojoExecutionException("Cannot build project dependency graph", exception);
+        }
+    }
 
-			buildingRequest.setProject(project);
+    // private methods --------------------------------------------------------
 
-			rootNode = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, null);
+    /**
+     * Serializes the specified dependency tree to a string.
+     *
+     * @param theRootNode the dependency tree root node to serialize
+     * @return the serialized dependency tree
+     */
+    private String serializeDependencyTree(DependencyNode theRootNode) {
+        StringWriter writer = new StringWriter();
 
-			dependencyTreeString = serializeDependencyTree(rootNode);
+        DependencyNodeVisitor visitor = new SerializingDependencyNodeVisitor(writer, toGraphTokens(tokens));
 
-			System.out.println(dependencyTreeString);
-		} catch (DependencyGraphBuilderException exception) {
-			throw new MojoExecutionException("Cannot build project dependency graph", exception);
-		}
-	}
+        // TODO: remove the need for this when the serializer can calculate last nodes
+        // from visitor calls only
+        visitor = new BuildingDependencyNodeVisitor(visitor);
 
-	// private methods --------------------------------------------------------
+        DependencyNodeFilter filter = new AndDependencyNodeFilter(new ArrayList<>());
 
-	/**
-	 * Serializes the specified dependency tree to a string.
-	 *
-	 * @param theRootNode the dependency tree root node to serialize
-	 * @return the serialized dependency tree
-	 */
-	private String serializeDependencyTree(DependencyNode theRootNode) {
-		StringWriter writer = new StringWriter();
+        if (filter != null) {
+            CollectingDependencyNodeVisitor collectingVisitor = new CollectingDependencyNodeVisitor();
+            DependencyNodeVisitor firstPassVisitor = new FilteringDependencyNodeVisitor(collectingVisitor, filter);
+            theRootNode.accept(firstPassVisitor);
 
-		DependencyNodeVisitor visitor = new SerializingDependencyNodeVisitor(writer, toGraphTokens(tokens));
+            DependencyNodeFilter secondPassFilter = new AncestorOrSelfDependencyNodeFilter(
+                    collectingVisitor.getNodes());
+            visitor = new FilteringDependencyNodeVisitor(visitor, secondPassFilter);
+        }
 
-		// TODO: remove the need for this when the serializer can calculate last nodes
-		// from visitor calls only
-		visitor = new BuildingDependencyNodeVisitor(visitor);
+        theRootNode.accept(visitor);
 
-		DependencyNodeFilter filter = new AndDependencyNodeFilter(new ArrayList<>());
+        return writer.toString();
+    }
 
-		if (filter != null) {
-			CollectingDependencyNodeVisitor collectingVisitor = new CollectingDependencyNodeVisitor();
-			DependencyNodeVisitor firstPassVisitor = new FilteringDependencyNodeVisitor(collectingVisitor, filter);
-			theRootNode.accept(firstPassVisitor);
+    /**
+     * Gets the graph tokens instance for the specified name.
+     *
+     * @param theTokens the graph tokens name
+     * @return the <code>GraphTokens</code> instance
+     */
+    private GraphTokens toGraphTokens(String theTokens) {
+        GraphTokens graphTokens;
 
-			DependencyNodeFilter secondPassFilter = new AncestorOrSelfDependencyNodeFilter(
-					collectingVisitor.getNodes());
-			visitor = new FilteringDependencyNodeVisitor(visitor, secondPassFilter);
-		}
+        if ("whitespace".equals(theTokens)) {
+            getLog().debug("+ Using whitespace tree tokens");
 
-		theRootNode.accept(visitor);
+            graphTokens = SerializingDependencyNodeVisitor.WHITESPACE_TOKENS;
+        } else if ("extended".equals(theTokens)) {
+            getLog().debug("+ Using extended tree tokens");
 
-		return writer.toString();
-	}
+            graphTokens = SerializingDependencyNodeVisitor.EXTENDED_TOKENS;
+        } else {
+            graphTokens = SerializingDependencyNodeVisitor.STANDARD_TOKENS;
+        }
 
-	/**
-	 * Gets the graph tokens instance for the specified name.
-	 *
-	 * @param theTokens the graph tokens name
-	 * @return the <code>GraphTokens</code> instance
-	 */
-	private GraphTokens toGraphTokens(String theTokens) {
-		GraphTokens graphTokens;
-
-		if ("whitespace".equals(theTokens)) {
-			getLog().debug("+ Using whitespace tree tokens");
-
-			graphTokens = SerializingDependencyNodeVisitor.WHITESPACE_TOKENS;
-		} else if ("extended".equals(theTokens)) {
-			getLog().debug("+ Using extended tree tokens");
-
-			graphTokens = SerializingDependencyNodeVisitor.EXTENDED_TOKENS;
-		} else {
-			graphTokens = SerializingDependencyNodeVisitor.STANDARD_TOKENS;
-		}
-
-		return graphTokens;
-	}
+        return graphTokens;
+    }
 
 }
