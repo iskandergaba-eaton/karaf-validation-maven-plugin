@@ -2,14 +2,33 @@ package com.eaton.maven.plugin.karaf.validation.dependency;
 
 import java.util.Objects;
 
-public class Dependency {
+public class Identifier {
 	
-	String groupId;
+	final String groupId;
 	
-	String artifactId;
+	final String artifactId;
 	
-	String version;
+	final String version;
 
+	public Identifier(String groupId, String artifactId, String version) {
+		super();
+		this.groupId = groupId;
+		this.artifactId = artifactId;
+		this.version = version;
+	}
+	
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public String getArtifactId() {
+		return artifactId;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(artifactId, groupId, version);
@@ -23,7 +42,7 @@ public class Dependency {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Dependency other = (Dependency) obj;
+		Identifier other = (Identifier) obj;
 		return Objects.equals(artifactId, other.artifactId) && Objects.equals(groupId, other.groupId)
 				&& Objects.equals(version, other.version);
 	}
