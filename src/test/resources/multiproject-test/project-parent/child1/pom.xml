@@ -27,6 +27,41 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-maven-plugin</artifactId>
+                <version>4.4.0</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>generate-features-file</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>features-generate-descriptor</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Global configuration -->
+                    <enableGeneration>true</enableGeneration>
+                    <outputFile>${project.build.directory}/features.xml</outputFile>
+                    <!-- Bundle specific configuration -->
+                    <includeProjectArtifact>true</includeProjectArtifact>
+                    <addTransitiveFeatures>false</addTransitiveFeatures>
+                    <!-- Merge bundle and feature dependencies as a feature dependency -->
+                    <simplifyBundleDependencies>true</simplifyBundleDependencies>
+                    <!-- Include all dependencies as dependency -->
+                    <includeTransitiveDependency>true</includeTransitiveDependency>
+                    <markTransitiveAsDependency>true</markTransitiveAsDependency>
+                    <markRuntimeScopeAsDependency>true</markRuntimeScopeAsDependency>
+                    <!-- Check dependencies -->
+                    <checkDependencyChange>true</checkDependencyChange>
+                    <failOnDependencyChange>false</failOnDependencyChange>
+                    <logDependencyChanges>true</logDependencyChanges>
+                    <!-- Can be changed to true to override all dependencies.xml at once -->
+                    <overwriteChangedDependencies>true</overwriteChangedDependencies>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

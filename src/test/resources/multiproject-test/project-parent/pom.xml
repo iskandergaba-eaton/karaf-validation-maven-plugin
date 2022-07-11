@@ -30,6 +30,7 @@
     <modules>
         <module>child1</module>
         <module>child2</module>
+        <module>child3</module>
         <module>dependency1</module>
     </modules>
     
