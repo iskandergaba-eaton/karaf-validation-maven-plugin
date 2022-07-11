@@ -15,6 +15,7 @@
 
         <!-- Versions -->
         <hibernate-osgi.version>6.0.0.Alpha7</hibernate-osgi.version>
+        <osgi.version>7.0.0</osgi.version>
     </properties>
 
 </project>

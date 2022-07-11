@@ -5,6 +5,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -33,15 +34,9 @@ import java.util.Map;
 /**
  * Analyze the whole project and output incoherent dependencies with some fix tips
  */
-@Mojo(name = "check-dependencies", aggregator = true)
+@Mojo(name = "check-dependencies", aggregator = true, defaultPhase = LifecyclePhase.VERIFY)
 public class KarafDependencyCheckMojo extends AbstractMojo {
     // fields -----------------------------------------------------------------
-
-    /**
-     * The Maven project.
-     */
-    @Parameter(defaultValue = "${project}", readonly = true, required = true)
-    private MavenProject project;
 
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
@@ -88,21 +83,14 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
             MavenProject mavenProject = new MavenProject();
 
             for (MavenProject project : reactorProjects) {
-                System.out.println("Checking project "+project.getName());
-                
-                var dependencyManagement = mavenProject.getDependencyManagement();
-                if(dependencyManagement != null) {
-                	System.out.println("Has dependency management " + dependencyManagement.getDependencies().isEmpty());
-                }
-
-                ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
-                        session.getProjectBuildingRequest());
-                buildingRequest.setProject(project);
-                var dependencyTree = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, null);
-                var artifact = dependencyTree.getArtifact();
-                System.out.println(artifact);
-                resolvedDependencies.put(project, dependencyTree);
-                System.out.println(serializeDependencyTree(resolvedDependencies.get(project)));
+            	ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+            	buildingRequest.setProject(project);
+            	var dependencyTree = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, artifact -> {
+            		return artifact.getArtifactId().equalsIgnoreCase("hibernate-osgi");
+            	});
+            	
+            	System.out.println(project);
+            	System.out.println(serializeDependencyTree(dependencyTree));
             }
         } catch (DependencyGraphBuilderException exception) {
             throw new MojoExecutionException("Cannot build project dependency graph", exception);

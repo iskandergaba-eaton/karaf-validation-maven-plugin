@@ -10,24 +10,15 @@
         <version>1</version>
     </parent>
 
-    <artifactId>multiproject-test-child1</artifactId>
-    <packaging>bundle</packaging>
+    <artifactId>multiproject-test-dependency1</artifactId>
+    <packaging>jar</packaging>
     
     <dependencies>
-    	<dependency>
-	    	<groupId>com.eaton.maven.plugins</groupId>
-	        <artifactId>multiproject-test-dependency1</artifactId>
-	        <version>1</version>
-        </dependency>
+		<dependency>
+		    <groupId>org.hibernate.validator</groupId>
+		    <artifactId>hibernate-validator</artifactId>
+		    <version>8.0.0.CR1</version>
+		</dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

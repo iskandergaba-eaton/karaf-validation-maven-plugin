@@ -27,16 +27,38 @@
         </dependencies>
     </dependencyManagement>
 
+    <modules>
+        <module>child1</module>
+        <module>child2</module>
+        <module>dependency1</module>
+    </modules>
+    
     <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-osgi</artifactId>
         </dependency>
     </dependencies>
-
-    <modules>
-        <module>child1</module>
-        <module>child2</module>
-    </modules>
+    
+    <build>
+    	<pluginManagement>
+	        <plugins>
+	            <plugin>
+	                <groupId>org.apache.felix</groupId>
+	                <artifactId>maven-bundle-plugin</artifactId>
+	                <version>5.1.4</version>
+	                <extensions>true</extensions>
+	            </plugin>
+	        </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
