@@ -63,17 +63,39 @@ class KarafDependencyTreeMojo extends MojoSupport {
 
     @Override
     public void execute() throws MojoExecutionException {
-        //String output = "";
         for (MavenProject project : reactorProjects) {
             this.dependencyHelper = DependencyTreeHelperFactory.createDependencyHelper(this.container, project,
                     this.mavenSession, this.artifactCacheSize, getLog());
             DependencyNode tree = this.dependencyHelper.getDependencyTree(project);
-            this.dependencyHelper.getDependencies(project, includeTransitiveDependency);
 
-            System.out.println(this.dependencyHelper.getTreeListing());
+            /*
+            System.out.println(tree.getArtifact());
+            for (DependencyNode node : tree.getChildren()) {
+                System.out.println(node.getArtifact());
+            }
+            System.out.println();
+            */
+
+            print(tree);
+            System.out.println();
+
+            //this.dependencyHelper.getDependencies(project, includeTransitiveDependency);
+            //System.out.println(this.dependencyHelper.getTreeListing());
         }
+    }
 
+    private void print(DependencyNode tree) {
+        print(tree, "");
+    }
 
+    private void print(DependencyNode tree, String spacing) {
+        if (tree != null) {
+            System.out.println(spacing + tree.getArtifact());
+            spacing += "\t";
+            for (DependencyNode node : tree.getChildren()) {
+                print(node, spacing);
+            }
+        }
     }
 
 }
