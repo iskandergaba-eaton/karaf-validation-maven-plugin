@@ -22,6 +22,18 @@
                 <artifactId>hibernate-osgi</artifactId>
                 <version>${hibernate-osgi.version}</version>
             </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.core</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
         </dependencies>
     </dependencyManagement>
 

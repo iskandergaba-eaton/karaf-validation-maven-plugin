@@ -13,23 +13,12 @@
     <artifactId>multiproject-test-child2</artifactId>
     <packaging>bundle</packaging>
 
-    <properties>
-        <osgi.version>7.0.0</osgi.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.core</artifactId>
-            <version>${osgi.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <version>${osgi.version}</version>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+		    <groupId>org.hibernate.orm</groupId>
+		    <artifactId>hibernate-osgi</artifactId>
+		    <version>6.0.0.Alpha1</version>
+		</dependency>
     </dependencies>
 
     <build>
@@ -37,8 +26,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>5.1.4</version>
-                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
