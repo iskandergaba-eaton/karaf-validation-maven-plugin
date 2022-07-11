@@ -89,12 +89,19 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
 
             for (MavenProject project : reactorProjects) {
                 System.out.println("Checking project "+project.getName());
+                
+                var dependencyManagement = mavenProject.getDependencyManagement();
+                if(dependencyManagement != null) {
+                	System.out.println("Has dependency management " + dependencyManagement.getDependencies().isEmpty());
+                }
 
                 ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
                         session.getProjectBuildingRequest());
                 buildingRequest.setProject(project);
-                resolvedDependencies.put(project, dependencyGraphBuilder.buildDependencyGraph(buildingRequest,
-                        null));
+                var dependencyTree = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, null);
+                var artifact = dependencyTree.getArtifact();
+                System.out.println(artifact);
+                resolvedDependencies.put(project, dependencyTree);
                 System.out.println(serializeDependencyTree(resolvedDependencies.get(project)));
             }
         } catch (DependencyGraphBuilderException exception) {

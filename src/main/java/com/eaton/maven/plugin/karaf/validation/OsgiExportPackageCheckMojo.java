@@ -45,8 +45,6 @@ public class OsgiExportPackageCheckMojo extends AbstractMojo {
      */
     @Override
     public void execute() throws MojoFailureException {
-        var goalSuccessful = true;
-
         var report = new Report("'check-packages' execution report:",
                 "Issues:", "Warnings:", "Tips:");
         var packageExportAnalyzer = new PackageExportAnalyzer(report);
@@ -77,7 +75,7 @@ public class OsgiExportPackageCheckMojo extends AbstractMojo {
                         String.format("Module '%s''s packaging is 'bundle' and there is no Export-Package entry into the manifest file.", MavenUtil.getModuleIdentifier(project))));
             }
 
-            // Add all clause to the analyzer
+            // Add all clauses to the analyzer
             for ( var clause : Parser.parseHeader( exportPackage ) )
             {
                 packageExportAnalyzer.add(project, clause);
@@ -89,6 +87,7 @@ public class OsgiExportPackageCheckMojo extends AbstractMojo {
 
         var reportString= report.toString();
         // log report
+        // TODO add logger and log in any cases
 
         // throw exception with the report
         if(!report.getSuccess()){
