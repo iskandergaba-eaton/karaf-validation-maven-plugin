@@ -1,6 +1,5 @@
-package com.eaton.maven.plugin.karaf.validation;
+package com.eaton.maven.plugin.karaf.validation.osgi.export;
 
-import com.eaton.maven.plugin.karaf.validation.manifest.PackageExportAnalyzer;
 import com.eaton.maven.plugin.karaf.validation.report.CriticalityLevel;
 import com.eaton.maven.plugin.karaf.validation.report.Issue;
 import com.eaton.maven.plugin.karaf.validation.report.Report;

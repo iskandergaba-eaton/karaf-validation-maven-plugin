@@ -24,6 +24,10 @@ import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
 import org.apache.maven.shared.dependency.graph.traversal.FilteringDependencyNodeVisitor;
 import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyNodeVisitor;
 import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyNodeVisitor.GraphTokens;
+import org.codehaus.plexus.PlexusContainer;
+
+import com.eaton.maven.plugin.karaf.validation.dependency.KarafDependencyResolver;
+import com.eaton.maven.plugin.karaf.validation.dependency.MavenDependencyResolver;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -37,9 +41,15 @@ import java.util.Map;
 @Mojo(name = "check-dependencies", aggregator = true, defaultPhase = LifecyclePhase.VERIFY)
 public class KarafDependencyCheckMojo extends AbstractMojo {
     // fields -----------------------------------------------------------------
+	
+    @Parameter(defaultValue = "1024")
+    private int artifactCacheSize;
 
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
+    
+    @Component
+    private PlexusContainer container;
 
     /**
      * Contains the full list of projects in the reactor.
@@ -48,27 +58,11 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
     private List<MavenProject> reactorProjects;
 
     /**
-     * The dependency collector builder to use.
-     */
-    @Component(hint = "default")
-    private DependencyCollectorBuilder dependencyCollectorBuilder;
-
-    /**
      * The dependency graph builder to use.
      */
     @Component(hint = "default")
     private DependencyGraphBuilder dependencyGraphBuilder;
 
-    /**
-     * The token set name to use when outputting the dependency tree. Possible
-     * values are <code>whitespace</code>, <code>standard</code> or
-     * <code>extended</code>, which use whitespace, standard (ie ASCII) or extended
-     * character sets respectively.
-     *
-     * @since 2.0-alpha-6
-     */
-    @Parameter(property = "tokens", defaultValue = "standard")
-    private String tokens;
 
     // Mojo methods -----------------------------------------------------------
 
@@ -77,82 +71,24 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+    	
+    	var log = getLog();
+    	
+    	KarafDependencyResolver karafDependencyResolver = new KarafDependencyResolver(session, container, log, artifactCacheSize);
+    	MavenDependencyResolver mavenDependencyResolver = new MavenDependencyResolver(session, dependencyGraphBuilder, log);
+    	
         try {
             // Building all dependencies trees
             Map<MavenProject, DependencyNode> resolvedDependencies = new HashMap<>();
-            MavenProject mavenProject = new MavenProject();
 
             for (MavenProject project : reactorProjects) {
-            	ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
-            	buildingRequest.setProject(project);
-            	var dependencyTree = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, artifact -> {
-            		return artifact.getArtifactId().equalsIgnoreCase("hibernate-osgi");
-            	});
+            	mavenDependencyResolver.getDependencies(project);
+            	karafDependencyResolver.getDependencies(project);
             	
-            	System.out.println(project);
-            	System.out.println(serializeDependencyTree(dependencyTree));
             }
         } catch (DependencyGraphBuilderException exception) {
             throw new MojoExecutionException("Cannot build project dependency graph", exception);
         }
-    }
-
-    // private methods --------------------------------------------------------
-
-    /**
-     * Serializes the specified dependency tree to a string.
-     *
-     * @param theRootNode the dependency tree root node to serialize
-     * @return the serialized dependency tree
-     */
-    private String serializeDependencyTree(DependencyNode theRootNode) {
-        StringWriter writer = new StringWriter();
-
-        DependencyNodeVisitor visitor = new SerializingDependencyNodeVisitor(writer, toGraphTokens(tokens));
-
-        // TODO: remove the need for this when the serializer can calculate last nodes
-        // from visitor calls only
-        visitor = new BuildingDependencyNodeVisitor(visitor);
-
-        DependencyNodeFilter filter = new AndDependencyNodeFilter(new ArrayList<>());
-
-        if (filter != null) {
-            CollectingDependencyNodeVisitor collectingVisitor = new CollectingDependencyNodeVisitor();
-            DependencyNodeVisitor firstPassVisitor = new FilteringDependencyNodeVisitor(collectingVisitor, filter);
-            theRootNode.accept(firstPassVisitor);
-
-            DependencyNodeFilter secondPassFilter = new AncestorOrSelfDependencyNodeFilter(
-                    collectingVisitor.getNodes());
-            visitor = new FilteringDependencyNodeVisitor(visitor, secondPassFilter);
-        }
-
-        theRootNode.accept(visitor);
-
-        return writer.toString();
-    }
-
-    /**
-     * Gets the graph tokens instance for the specified name.
-     *
-     * @param theTokens the graph tokens name
-     * @return the <code>GraphTokens</code> instance
-     */
-    private GraphTokens toGraphTokens(String theTokens) {
-        GraphTokens graphTokens;
-
-        if ("whitespace".equals(theTokens)) {
-            getLog().debug("+ Using whitespace tree tokens");
-
-            graphTokens = SerializingDependencyNodeVisitor.WHITESPACE_TOKENS;
-        } else if ("extended".equals(theTokens)) {
-            getLog().debug("+ Using extended tree tokens");
-
-            graphTokens = SerializingDependencyNodeVisitor.EXTENDED_TOKENS;
-        } else {
-            graphTokens = SerializingDependencyNodeVisitor.STANDARD_TOKENS;
-        }
-
-        return graphTokens;
     }
 
 }

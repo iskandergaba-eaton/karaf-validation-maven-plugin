@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.eaton.maven.plugin.karaf.validation.dependency;
+package com.eaton.maven.plugin.karaf.validation.dependency.karaf;
 
 import java.util.Objects;
 
