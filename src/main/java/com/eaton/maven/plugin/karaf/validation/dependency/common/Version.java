@@ -8,7 +8,7 @@ public class Version {
 	
 	Identifier sourceProject;
 
-	Set<SourceClasspath> sourceClasspath;
+	Set<SourceClasspath> sourceClasspaths;
 
 	String version;
 	
@@ -17,10 +17,43 @@ public class Version {
 	public Version(Identifier sourceProject, SourceClasspath sourceClasspath, String version, boolean managed) {
 		super();
 		this.sourceProject = sourceProject;
-		this.sourceClasspath = new HashSet<>();
-		this.sourceClasspath.add(sourceClasspath);
+		this.sourceClasspaths = new HashSet<>();
+		this.sourceClasspaths.add(sourceClasspath);
 		this.version = version;
 		this.managed = managed;
+	}
+
+	public Version(Identifier sourceProject, Set<SourceClasspath> sourceClasspaths, String version, boolean managed) {
+		super();
+		this.sourceProject = sourceProject;
+		this.sourceClasspaths = new HashSet<>();
+		this.sourceClasspaths.addAll(sourceClasspaths);
+		this.version = version;
+		this.managed = managed;
+	}
+
+	public Identifier getProject() {
+		return sourceProject;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public boolean hasSingleSourceClasspath() {
+		return sourceClasspaths.size() == 1;
+	}
+
+	public Set<SourceClasspath> getSourceClasspaths() {
+		return sourceClasspaths;
+	}
+
+	public void addSourceClasspath(SourceClasspath sourceClasspath) {
+		this.sourceClasspaths.add(sourceClasspath);
+	}
+
+	public boolean isManaged() {
+		return managed;
 	}
 
 	@Override
@@ -40,21 +73,9 @@ public class Version {
 		return managed == other.managed && Objects.equals(version, other.version);
 	}
 
-	public Identifier getProject() {
-		return sourceProject;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public boolean isManaged() {
-		return managed;
-	}
-
 	@Override
 	public String toString() {
-		return version;
+		return version + "-" + sourceClasspaths;
 	}
 
 }

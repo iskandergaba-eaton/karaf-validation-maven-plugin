@@ -51,6 +51,24 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
     @Component(hint = "default")
     private DependencyGraphBuilder dependencyGraphBuilder;
 
+    public Map<Identifier, Dependency> mergeDependencyMaps(Map<Identifier, Dependency> mavenMap, Map<Identifier, Dependency> karafMap) {
+        Map<Identifier, Dependency> combinedMap = new HashMap<>();
+        for (Identifier id : mavenMap.keySet()) {
+            if (karafMap.containsKey(id)) {
+                combinedMap.put(id, mavenMap.get(id).merge(karafMap.get(id)));
+            } else {
+                combinedMap.put(id, mavenMap.get(id));
+            }
+        }
+
+        for (Identifier id : karafMap.keySet()) {
+            if (!combinedMap.containsKey(id)) {
+                combinedMap.put(id, karafMap.get(id));
+            }
+        }
+        return combinedMap;
+    }
+
 
     // Mojo methods -----------------------------------------------------------
 
@@ -71,10 +89,17 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
             for (MavenProject project : reactorProjects) {
                 try {
                     Map<Identifier, Dependency> mavenMap = mavenDependencyResolver.getDependencies(project);
-                    log.info(mavenMap.values().toString());
-
                     Map<Identifier, Dependency> karafMap = karafDependencyResolver.getDependencies(project);
-                    log.info(karafMap.values().toString());
+                    Map<Identifier, Dependency> combinedMap = mergeDependencyMaps(mavenMap, karafMap);
+
+                    log.info("START: List of dependencies with multiple versions.");
+                    for (Dependency d : combinedMap.values()) {
+                        if (!d.hasSingleVersion()) {
+                            log.info(d.toString());
+                        }
+                    }
+                    log.info("END: List of dependencies with multiple versions.");
+
                 } catch (DependencyGraphBuilderException e) {
                     throw new RuntimeException(e);
                 }
