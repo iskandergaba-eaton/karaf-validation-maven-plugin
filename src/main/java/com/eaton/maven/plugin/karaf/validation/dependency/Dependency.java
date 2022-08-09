@@ -1,15 +1,15 @@
-package com.eaton.maven.plugin.karaf.validation.dependency.conflict;
+package com.eaton.maven.plugin.karaf.validation.dependency;
 
 import java.util.Set;
 import java.util.TreeSet;
 
-public class ProjectDependency {
+public class Dependency {
 	
 	Identifier identifier;
 	
 	Set<Version> versions;
 
-	public ProjectDependency(Identifier dependencyIdentifier) {
+	public Dependency(Identifier dependencyIdentifier) {
 		this.identifier = dependencyIdentifier;
 		this.versions = new TreeSet<Version>();
 	}

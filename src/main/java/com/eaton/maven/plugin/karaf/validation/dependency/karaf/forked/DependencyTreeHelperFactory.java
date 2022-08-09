@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.eaton.maven.plugin.karaf.validation.dependency.karaf;
+package com.eaton.maven.plugin.karaf.validation.dependency.karaf.forked;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;

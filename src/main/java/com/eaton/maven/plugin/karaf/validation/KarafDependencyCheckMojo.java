@@ -26,8 +26,8 @@ import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyN
 import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyNodeVisitor.GraphTokens;
 import org.codehaus.plexus.PlexusContainer;
 
-import com.eaton.maven.plugin.karaf.validation.dependency.KarafDependencyResolver;
-import com.eaton.maven.plugin.karaf.validation.dependency.MavenDependencyResolver;
+import com.eaton.maven.plugin.karaf.validation.dependency.karaf.KarafDependencyResolver;
+import com.eaton.maven.plugin.karaf.validation.dependency.maven.MavenDependencyResolver;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -77,7 +77,6 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
     	KarafDependencyResolver karafDependencyResolver = new KarafDependencyResolver(session, container, log, artifactCacheSize);
     	MavenDependencyResolver mavenDependencyResolver = new MavenDependencyResolver(session, dependencyGraphBuilder, log);
     	
-        try {
             // Building all dependencies trees
             Map<MavenProject, DependencyNode> resolvedDependencies = new HashMap<>();
 
@@ -86,9 +85,6 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
             	karafDependencyResolver.getDependencies(project);
             	
             }
-        } catch (DependencyGraphBuilderException exception) {
-            throw new MojoExecutionException("Cannot build project dependency graph", exception);
-        }
     }
 
 }

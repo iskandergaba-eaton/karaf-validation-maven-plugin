@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.eaton.maven.plugin.karaf.validation.dependency.karaf;
+package com.eaton.maven.plugin.karaf.validation.dependency.karaf.forked;
 
 import com.eaton.maven.plugin.karaf.validation.util.MavenUtil;
 import org.apache.karaf.tooling.utils.SimpleLRUCache;

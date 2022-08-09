@@ -1,4 +1,4 @@
-package com.eaton.maven.plugin.karaf.validation.dependency.conflict;
+package com.eaton.maven.plugin.karaf.validation.dependency;
 
 import java.util.Objects;
 
