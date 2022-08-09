@@ -2,6 +2,7 @@ package com.eaton.maven.plugin.karaf.validation.dependency.maven;
 
 import java.util.Map;
 
+import com.eaton.maven.plugin.karaf.validation.dependency.maven.graph.MavenDependencyMapGenerator;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -12,17 +13,17 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 
-import com.eaton.maven.plugin.karaf.validation.dependency.DependencyResolver;
-import com.eaton.maven.plugin.karaf.validation.dependency.Identifier;
-import com.eaton.maven.plugin.karaf.validation.dependency.Dependency;
+import com.eaton.maven.plugin.karaf.validation.dependency.common.DependencyResolver;
+import com.eaton.maven.plugin.karaf.validation.dependency.common.Identifier;
+import com.eaton.maven.plugin.karaf.validation.dependency.common.Dependency;
 
 public class MavenDependencyResolver implements DependencyResolver {
 
-	private MavenSession mavenSession;
+	private final MavenSession mavenSession;
 
-	private DependencyGraphBuilder dependencyGraphBuilder;
+	private final DependencyGraphBuilder dependencyGraphBuilder;
 	
-	private Log log;
+	private final Log log;
 
 	public MavenDependencyResolver(MavenSession mavenSession, DependencyGraphBuilder dependencyGraphBuilder, Log log) {
 			this.mavenSession = mavenSession;
@@ -37,9 +38,11 @@ public class MavenDependencyResolver implements DependencyResolver {
 	}
 
 	@Override
-	public Map<Identifier, Dependency> getDependencies(MavenProject project) {
-		// TODO
-		return null;
+	public Map<Identifier, Dependency> getDependencies(MavenProject project) throws MojoExecutionException, DependencyGraphBuilderException {
+		DependencyNode root = fetchDependencies(project);
+		Identifier identifier = new Identifier(project.getGroupId(), project.getArtifactId());
+		MavenDependencyMapGenerator generator = new MavenDependencyMapGenerator(identifier);
+		root.accept(generator);
+		return generator.getDependencyMap();
 	}
-	
 }

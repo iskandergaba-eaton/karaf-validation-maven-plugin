@@ -1,4 +1,4 @@
-package com.eaton.maven.plugin.karaf.validation.dependency;
+package com.eaton.maven.plugin.karaf.validation.dependency.common;
 
 import java.util.Objects;
 
@@ -12,6 +12,14 @@ public class Identifier {
 		super();
 		this.groupId = groupId;
 		this.artifactId = artifactId;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public String getArtifactId() {
+		return artifactId;
 	}
 
 	@Override
@@ -31,12 +39,8 @@ public class Identifier {
 		return Objects.equals(artifactId, other.artifactId) && Objects.equals(groupId, other.groupId);
 	}
 
-	public String getGroupId() {
-		return groupId;
+	@Override
+	public String toString() {
+		return groupId + ":" + artifactId;
 	}
-
-	public String getArtifactId() {
-		return artifactId;
-	}
-	
 }

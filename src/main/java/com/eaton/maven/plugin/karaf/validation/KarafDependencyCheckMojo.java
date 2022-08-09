@@ -1,5 +1,7 @@
 package com.eaton.maven.plugin.karaf.validation;
 
+import com.eaton.maven.plugin.karaf.validation.dependency.common.Dependency;
+import com.eaton.maven.plugin.karaf.validation.dependency.common.Identifier;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -8,29 +10,15 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.dependency.graph.DependencyCollectorBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
-import org.apache.maven.shared.dependency.graph.filter.AncestorOrSelfDependencyNodeFilter;
-import org.apache.maven.shared.dependency.graph.filter.AndDependencyNodeFilter;
-import org.apache.maven.shared.dependency.graph.filter.DependencyNodeFilter;
-import org.apache.maven.shared.dependency.graph.traversal.BuildingDependencyNodeVisitor;
-import org.apache.maven.shared.dependency.graph.traversal.CollectingDependencyNodeVisitor;
-import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
-import org.apache.maven.shared.dependency.graph.traversal.FilteringDependencyNodeVisitor;
-import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyNodeVisitor;
-import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyNodeVisitor.GraphTokens;
 import org.codehaus.plexus.PlexusContainer;
 
 import com.eaton.maven.plugin.karaf.validation.dependency.karaf.KarafDependencyResolver;
 import com.eaton.maven.plugin.karaf.validation.dependency.maven.MavenDependencyResolver;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,9 +69,15 @@ public class KarafDependencyCheckMojo extends AbstractMojo {
             Map<MavenProject, DependencyNode> resolvedDependencies = new HashMap<>();
 
             for (MavenProject project : reactorProjects) {
-            	mavenDependencyResolver.getDependencies(project);
-            	karafDependencyResolver.getDependencies(project);
-            	
+                try {
+                    Map<Identifier, Dependency> mavenMap = mavenDependencyResolver.getDependencies(project);
+                    log.info(mavenMap.values().toString());
+
+                    Map<Identifier, Dependency> karafMap = karafDependencyResolver.getDependencies(project);
+                    log.info(karafMap.values().toString());
+                } catch (DependencyGraphBuilderException e) {
+                    throw new RuntimeException(e);
+                }
             }
     }
 

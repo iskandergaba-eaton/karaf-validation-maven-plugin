@@ -1,18 +1,24 @@
-package com.eaton.maven.plugin.karaf.validation.dependency;
+package com.eaton.maven.plugin.karaf.validation.dependency.common;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class Version {
 	
 	Identifier sourceProject;
-	
+
+	Set<SourceClasspath> sourceClasspath;
+
 	String version;
 	
 	boolean managed;
 
-	public Version(Identifier sourceProject, String version, boolean managed) {
+	public Version(Identifier sourceProject, SourceClasspath sourceClasspath, String version, boolean managed) {
 		super();
 		this.sourceProject = sourceProject;
+		this.sourceClasspath = new HashSet<>();
+		this.sourceClasspath.add(sourceClasspath);
 		this.version = version;
 		this.managed = managed;
 	}
@@ -44,6 +50,11 @@ public class Version {
 
 	public boolean isManaged() {
 		return managed;
+	}
+
+	@Override
+	public String toString() {
+		return version;
 	}
 
 }
