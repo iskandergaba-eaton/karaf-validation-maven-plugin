@@ -1,64 +1,57 @@
 package com.eaton.maven.plugin.karaf.validation.dependency.common;
 
-import java.util.HashSet;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.StringJoiner;
+
+import com.eaton.maven.plugin.karaf.validation.dependency.common.Source.Classpath;
 
 public class Version {
+
+	String id;
+
+	Map<Classpath, Source> sources;
+
+	public Version(String id, Source source) {
+		this.sources = new EnumMap<Source.Classpath, Source>(Classpath.class);
+		this.sources.put(source.getClasspath(), source);
+		this.id = id;
+	}
+
+	public Version(String id) {
+		this.sources = new HashMap<>();
+		this.id = id;
+	}
+
+	public String getId() {
+		return id;
+	}
 	
-	Identifier sourceProject;
-
-	Set<SourceClasspath> sourceClasspaths;
-
-	String version;
-	
-	boolean managed;
-
-	public Version(Identifier sourceProject, SourceClasspath sourceClasspath, String version, boolean managed) {
-		super();
-		this.sourceProject = sourceProject;
-		this.sourceClasspaths = new HashSet<>();
-		this.sourceClasspaths.add(sourceClasspath);
-		this.version = version;
-		this.managed = managed;
-	}
-
-	public Version(Identifier sourceProject, Set<SourceClasspath> sourceClasspaths, String version, boolean managed) {
-		super();
-		this.sourceProject = sourceProject;
-		this.sourceClasspaths = new HashSet<>();
-		this.sourceClasspaths.addAll(sourceClasspaths);
-		this.version = version;
-		this.managed = managed;
-	}
-
-	public Identifier getProject() {
-		return sourceProject;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
 	public boolean hasSingleSourceClasspath() {
-		return sourceClasspaths.size() == 1;
+		return sources.size() == 1;
 	}
 
-	public Set<SourceClasspath> getSourceClasspaths() {
-		return sourceClasspaths;
+	public void add(Source source) {
+		var identifier = source.getClasspath();
+		var value = sources.get(identifier);
+		if (value == null) {
+			value = new Source(identifier);
+		}
+		value.merge(source);
+		sources.put(identifier, value);
 	}
 
-	public void addSourceClasspath(SourceClasspath sourceClasspath) {
-		this.sourceClasspaths.add(sourceClasspath);
-	}
-
-	public boolean isManaged() {
-		return managed;
+	public void merge(Version other) {
+		for (Source source : other.sources.values()) {
+			add(source);
+		}
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(managed, version);
+		return Objects.hash(id);
 	}
 
 	@Override
@@ -70,12 +63,13 @@ public class Version {
 		if (getClass() != obj.getClass())
 			return false;
 		Version other = (Version) obj;
-		return managed == other.managed && Objects.equals(version, other.version);
+		return Objects.equals(id, other.id);
 	}
 
-	@Override
-	public String toString() {
-		return version + "-" + sourceClasspaths;
+	public String toString(String prefix) {
+		StringJoiner sourcesJoiner = new StringJoiner("");
+		sources.values().forEach(s -> sourcesJoiner.add(s.toString(prefix + "\t")));
+		return prefix + id + ":" + sourcesJoiner.toString();
 	}
 
 }

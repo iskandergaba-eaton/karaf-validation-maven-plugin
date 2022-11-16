@@ -39,8 +39,7 @@ public class Identifier {
 		return Objects.equals(artifactId, other.artifactId) && Objects.equals(groupId, other.groupId);
 	}
 
-	@Override
-	public String toString() {
-		return groupId + ":" + artifactId;
+	public String toString(String prefix) {
+		return prefix + groupId + ":" + artifactId;
 	}
 }

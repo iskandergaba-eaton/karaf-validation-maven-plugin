@@ -3,7 +3,9 @@ package com.eaton.maven.plugin.karaf.validation.dependency.maven.graph;
 
 import com.eaton.maven.plugin.karaf.validation.dependency.common.Dependency;
 import com.eaton.maven.plugin.karaf.validation.dependency.common.Identifier;
-import com.eaton.maven.plugin.karaf.validation.dependency.common.SourceClasspath;
+import com.eaton.maven.plugin.karaf.validation.dependency.common.Source;
+import com.eaton.maven.plugin.karaf.validation.dependency.common.Version;
+
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
 
@@ -13,19 +15,20 @@ import java.util.Map;
 
 public class MavenDependencyMapGenerator implements DependencyNodeVisitor {
 
-    private final Identifier projectIdentifier;
+    private final Source source;
     private final Map<Identifier, Dependency> dependencyMap = new HashMap<>();
     private final Map<DependencyNode, Object> visitedNodes = new IdentityHashMap<>(512);
 
     public MavenDependencyMapGenerator(Identifier projectIdentifier) {
-        this.projectIdentifier = projectIdentifier;
+        this.source = new Source(Source.Classpath.MAVEN);
+        this.source.add(projectIdentifier);
     }
 
     private Dependency getDependency(DependencyNode node) {
         //TODO: Check for managed versions
         Identifier identifier = new Identifier(node.getArtifact().getGroupId(), node.getArtifact().getArtifactId());
         Dependency dependency = new Dependency(identifier);
-        dependency.add(projectIdentifier, SourceClasspath.MAVEN, node.getArtifact().getVersion(), false);
+        dependency.add(new Version(node.getArtifact().getVersion(), source));
         return dependency;
     }
 

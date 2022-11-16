@@ -20,90 +20,105 @@ import com.eaton.maven.plugin.karaf.validation.dependency.karaf.KarafDependencyR
 import com.eaton.maven.plugin.karaf.validation.dependency.maven.MavenDependencyResolver;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Analyze the whole project and output incoherent dependencies with some fix tips
+ * Analyze the whole project and output incoherent dependencies with some fix
+ * tips
  */
 @Mojo(name = "check-dependencies", aggregator = true, defaultPhase = LifecyclePhase.VERIFY)
 public class KarafDependencyCheckMojo extends AbstractMojo {
-    // fields -----------------------------------------------------------------
-	
-    @Parameter(defaultValue = "1024")
-    private int artifactCacheSize;
+	// fields -----------------------------------------------------------------
 
-    @Parameter(defaultValue = "${session}", readonly = true, required = true)
-    private MavenSession session;
-    
-    @Component
-    private PlexusContainer container;
+	@Parameter(defaultValue = "1024")
+	private int artifactCacheSize;
 
-    /**
-     * Contains the full list of projects in the reactor.
-     */
-    @Parameter(defaultValue = "${reactorProjects}", readonly = true, required = true)
-    private List<MavenProject> reactorProjects;
+	@Parameter(defaultValue = "${session}", readonly = true, required = true)
+	private MavenSession session;
 
-    /**
-     * The dependency graph builder to use.
-     */
-    @Component(hint = "default")
-    private DependencyGraphBuilder dependencyGraphBuilder;
+	@Component
+	private PlexusContainer container;
 
-    public Map<Identifier, Dependency> mergeDependencyMaps(Map<Identifier, Dependency> mavenMap, Map<Identifier, Dependency> karafMap) {
-        Map<Identifier, Dependency> combinedMap = new HashMap<>();
-        for (Identifier id : mavenMap.keySet()) {
-            if (karafMap.containsKey(id)) {
-                combinedMap.put(id, mavenMap.get(id).merge(karafMap.get(id)));
-            } else {
-                combinedMap.put(id, mavenMap.get(id));
-            }
-        }
+	/**
+	 * Contains the full list of projects in the reactor.
+	 */
+	@Parameter(defaultValue = "${reactorProjects}", readonly = true, required = true)
+	private List<MavenProject> reactorProjects;
 
-        for (Identifier id : karafMap.keySet()) {
-            if (!combinedMap.containsKey(id)) {
-                combinedMap.put(id, karafMap.get(id));
-            }
-        }
-        return combinedMap;
-    }
+	/**
+	 * The dependency graph builder to use.
+	 */
+	@Component(hint = "default")
+	private DependencyGraphBuilder dependencyGraphBuilder;
 
+	public void mergeDependencyMaps(Map<Identifier, Dependency> globalMap, Map<Identifier, Dependency> mavenMap,
+			Map<Identifier, Dependency> karafMap) {
 
-    // Mojo methods -----------------------------------------------------------
+		Set<Identifier> keys = new HashSet<Identifier>();
+		keys.addAll(globalMap.keySet());
+		keys.addAll(mavenMap.keySet());
+		keys.addAll(karafMap.keySet());
 
-    /*
-     * @see org.apache.maven.plugin.Mojo#execute()
-     */
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-    	
-    	var log = getLog();
-    	
-    	KarafDependencyResolver karafDependencyResolver = new KarafDependencyResolver(session, container, log, artifactCacheSize);
-    	MavenDependencyResolver mavenDependencyResolver = new MavenDependencyResolver(session, dependencyGraphBuilder, log);
-    	
-            // Building all dependencies trees
-            Map<MavenProject, DependencyNode> resolvedDependencies = new HashMap<>();
+		for (Identifier identifier : keys) {
+			Dependency maven = mavenMap.get(identifier);
+			Dependency karaf = karafMap.get(identifier);
 
-            for (MavenProject project : reactorProjects) {
-                try {
-                    Map<Identifier, Dependency> mavenMap = mavenDependencyResolver.getDependencies(project);
-                    Map<Identifier, Dependency> karafMap = karafDependencyResolver.getDependencies(project);
-                    Map<Identifier, Dependency> combinedMap = mergeDependencyMaps(mavenMap, karafMap);
+			if (maven != null || karaf != null) {
+				globalMap.compute(identifier, (key, value) -> {
+					Dependency global = value == null ? new Dependency(identifier) : value;
 
-                    log.info("START: List of dependencies with multiple versions.");
-                    for (Dependency d : combinedMap.values()) {
-                        if (!d.hasSingleVersion()) {
-                            log.info(d.toString());
-                        }
-                    }
-                    log.info("END: List of dependencies with multiple versions.");
+					if (maven != null) {
+						global.merge(maven);
+					}
 
-                } catch (DependencyGraphBuilderException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-    }
+					if (karaf != null) {
+						global.merge(karaf);
+					}
+
+					return global;
+				});
+			}
+		}
+	}
+
+	// Mojo methods -----------------------------------------------------------
+
+	/*
+	 * @see org.apache.maven.plugin.Mojo#execute()
+	 */
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+
+		var log = getLog();
+
+		KarafDependencyResolver karafDependencyResolver = new KarafDependencyResolver(session, container, log,
+				artifactCacheSize);
+		MavenDependencyResolver mavenDependencyResolver = new MavenDependencyResolver(session, dependencyGraphBuilder,
+				log);
+
+		// Building all dependencies trees
+		Map<Identifier, Dependency> globalMap = new HashMap<>();
+
+		for (MavenProject project : reactorProjects) {
+			try {
+				Map<Identifier, Dependency> mavenMap = mavenDependencyResolver.getDependencies(project);
+				Map<Identifier, Dependency> karafMap = karafDependencyResolver.getDependencies(project);
+				mergeDependencyMaps(globalMap, mavenMap, karafMap);
+			} catch (DependencyGraphBuilderException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		log.info("START: List of dependencies with multiple versions.");
+		for (Dependency dependency : globalMap.values()) {
+			if (!dependency.hasSingleVersion()) {
+				log.info(dependency.toString("\n\t"));
+			}
+		}
+		log.info("END: List of dependencies with multiple versions.");
+	}
 
 }
