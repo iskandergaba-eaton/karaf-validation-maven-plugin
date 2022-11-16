@@ -3,14 +3,22 @@
     <feature version="0.0.0">
         <feature>wrap</feature>
         <bundle>mvn:com.eaton.maven.plugins/multiproject-test-child1/1</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.12.4</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.12.4</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.12.4</bundle>
         <bundle>mvn:com.fasterxml/classmate/1.5.1</bundle>
         <bundle>mvn:com.ibm.icu/icu4j/61.1</bundle>
+        <bundle>mvn:commons-io/commons-io/2.11.0</bundle>
+        <bundle>mvn:fr.inria.gforge.spoon/spoon-core/10.2.0</bundle>
         <bundle>mvn:jakarta.validation/jakarta.validation-api/3.0.2</bundle>
         <bundle>mvn:javax.interceptor/javax.interceptor-api/1.2</bundle>
         <bundle>mvn:javax.persistence/javax.persistence-api/2.2</bundle>
         <bundle>mvn:net.bytebuddy/byte-buddy/1.10.21</bundle>
         <bundle>mvn:org.abego.treelayout/org.abego.treelayout.core/1.0.3</bundle>
         <bundle>mvn:org.antlr/antlr4-runtime/4.9.1</bundle>
+        <bundle>mvn:org.apache.commons/commons-compress/1.21</bundle>
+        <bundle>mvn:org.apache.commons/commons-lang3/3.12.0</bundle>
+        <bundle>mvn:org.eclipse.jdt/org.eclipse.jdt.core/3.26.0</bundle>
         <bundle>mvn:org.glassfish/javax.json/1.0.4</bundle>
         <bundle>mvn:org.hibernate.common/hibernate-commons-annotations/5.1.2.Final</bundle>
         <bundle>mvn:org.hibernate.orm/hibernate-core/6.0.0.Alpha7</bundle>
@@ -21,10 +29,19 @@
         <bundle>mvn:org.jboss/jandex/2.2.3.Final</bundle>
         <bundle>mvn:org.osgi/org.osgi.compendium/5.0.0</bundle>
         <bundle>mvn:org.osgi/org.osgi.core/6.0.0</bundle>
+        <bundle>mvn:org.slf4j/slf4j-api/1.7.32</bundle>
         <bundle>wrap:mvn:com.eaton.maven.plugins/multiproject-test-dependency1/1</bundle>
+        <bundle>wrap:mvn:com.martiansoftware/jsap/2.1</bundle>
+        <bundle>wrap:mvn:fr.inria.gforge.spoon/spoon-core/9.1.0</bundle>
+        <bundle>wrap:mvn:javax.inject/javax.inject/1</bundle>
         <bundle>wrap:mvn:org.antlr/ST4/4.3</bundle>
         <bundle>wrap:mvn:org.antlr/antlr-runtime/3.5.2</bundle>
         <bundle>wrap:mvn:org.antlr/antlr4/4.9.1</bundle>
+        <bundle>wrap:mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/1.0.10/xml</bundle>
+        <bundle>wrap:mvn:org.apache.maven.shared/maven-invoker/3.1.0</bundle>
+        <bundle>wrap:mvn:org.apache.maven.shared/maven-shared-utils/3.3.3</bundle>
+        <bundle>wrap:mvn:org.apache.maven/maven-model/3.8.2</bundle>
+        <bundle>wrap:mvn:org.codehaus.plexus/plexus-utils/3.2.1</bundle>
         <bundle>wrap:mvn:org.dom4j/dom4j/2.1.3</bundle>
     </feature>
 </features>
