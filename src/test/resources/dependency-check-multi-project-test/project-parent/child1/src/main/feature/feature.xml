@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features name="${project.artifactId}" xmlns="http://karaf.apache.org/xmlns/features/v1.6.0">
+
+    <feature name="${project.artifactId}" version="${project.version}">
+        <bundle dependency="true">wrap:mvn:fr.inria.gforge.spoon/spoon-core/10.2.0</bundle>
+    </feature>
+
+</features>

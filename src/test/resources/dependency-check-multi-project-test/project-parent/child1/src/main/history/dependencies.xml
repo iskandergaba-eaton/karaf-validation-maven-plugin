@@ -9,7 +9,6 @@
         <bundle>mvn:com.fasterxml/classmate/1.5.1</bundle>
         <bundle>mvn:com.ibm.icu/icu4j/61.1</bundle>
         <bundle>mvn:commons-io/commons-io/2.11.0</bundle>
-        <bundle>mvn:fr.inria.gforge.spoon/spoon-core/10.2.0</bundle>
         <bundle>mvn:jakarta.validation/jakarta.validation-api/3.0.2</bundle>
         <bundle>mvn:javax.interceptor/javax.interceptor-api/1.2</bundle>
         <bundle>mvn:javax.persistence/javax.persistence-api/2.2</bundle>
@@ -32,6 +31,7 @@
         <bundle>mvn:org.slf4j/slf4j-api/1.7.32</bundle>
         <bundle>wrap:mvn:com.eaton.maven.plugins/multiproject-test-dependency1/1</bundle>
         <bundle>wrap:mvn:com.martiansoftware/jsap/2.1</bundle>
+        <bundle>wrap:mvn:fr.inria.gforge.spoon/spoon-core/10.2.0</bundle>
         <bundle>wrap:mvn:fr.inria.gforge.spoon/spoon-core/9.1.0</bundle>
         <bundle>wrap:mvn:javax.inject/javax.inject/1</bundle>
         <bundle>wrap:mvn:org.antlr/ST4/4.3</bundle>

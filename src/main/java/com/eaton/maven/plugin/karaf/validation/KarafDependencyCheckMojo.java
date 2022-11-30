@@ -2,6 +2,8 @@ package com.eaton.maven.plugin.karaf.validation;
 
 import com.eaton.maven.plugin.karaf.validation.dependency.common.Dependency;
 import com.eaton.maven.plugin.karaf.validation.dependency.common.Identifier;
+import com.eaton.maven.plugin.karaf.validation.dependency.karaf.KarafDependencyResolver;
+import com.eaton.maven.plugin.karaf.validation.dependency.maven.MavenDependencyResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -13,11 +15,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
-import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.codehaus.plexus.PlexusContainer;
-
-import com.eaton.maven.plugin.karaf.validation.dependency.karaf.KarafDependencyResolver;
-import com.eaton.maven.plugin.karaf.validation.dependency.maven.MavenDependencyResolver;
 
 import java.util.HashMap;
 import java.util.HashSet;
